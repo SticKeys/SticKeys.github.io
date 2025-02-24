@@ -1,0 +1,448 @@
+<style>
+  .sudoku-board {
+    border-collapse: collapse;
+    margin: 0 auto;
+  }
+  .sudoku-cell {
+    width: 50px;
+    height: 50px;
+    text-align: center;
+    border: 1px solid #999;
+    position: relative;
+  }
+  .sudoku-cell:nth-child(3n) {
+    border-right: 2px solid #333;
+  }
+  .sudoku-row:nth-child(3n) td {
+    border-bottom: 2px solid #333;
+  }
+  .given {
+    font-weight: bold;
+    font-size: 24px;
+    color: #000;
+  }
+  .input-cell {
+    width: 100%;
+    height: 100%;
+    border: none;
+    text-align: center;
+    font-size: 24px;
+    padding: 0;
+    outline: none;
+    color: #0066cc;
+  }
+  .placeholder {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    right: 2px;
+    bottom: 2px;
+    font-size: 10px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    pointer-events: none;
+  }
+  .placeholder span {
+    color: #999;
+  }
+  .sudoku-controls {
+    margin-top: 20px;
+    text-align: center;
+  }
+  .mode-toggle {
+    padding: 8px 16px;
+    margin: 0 10px;
+    cursor: pointer;
+    background-color: #f0f0f0;
+    border: 1px solid #999;
+    border-radius: 4px;
+  }
+  .mode-toggle.active {
+    background-color: #0066cc;
+    color: white;
+  }
+  .highlight-correct {
+    background-color: #ccffcc;
+  }
+  .highlight-incorrect {
+    background-color: #ffcccc;
+  }
+  .upload-container {
+    margin-top: 20px;
+    text-align: center;
+  }
+</style>
+
+<div class="sudoku-controls">
+  <button class="mode-toggle active" onclick="setMode('normal')">Normal Mode</button>
+  <button class="mode-toggle" onclick="setMode('pencil')">Pencil Mark Mode</button>
+  <button class="mode-toggle" onclick="toggleHighlight()">Toggle Highlight</button>
+</div>
+
+<div class="upload-container">
+  <input type="file" id="sudoku-image" accept="image/*">
+  <button onclick="uploadImage()">Upload Image</button>
+</div>
+
+<table class="sudoku-board" id="sudoku-grid">
+  <!-- Grid will be populated by JavaScript -->
+</table>
+
+<script>
+let currentMode = 'normal';
+let highlightMode = false;
+let currentPuzzle = null;
+let solution = null;
+
+function generatePuzzle() {
+  // Generate empty 9x9 grid
+  const grid = Array(9).fill().map(() => Array(9).fill(0));
+  
+  // Fill diagonal boxes first (these are independent)
+  for (let i = 0; i < 9; i += 3) {
+    fillBox(grid, i, i);
+  }
+  
+  // Solve the rest of the puzzle
+  solveSudoku(grid);
+  
+  // Store the solution
+  solution = grid.map(row => [...row]);
+  
+  // Remove numbers to create puzzle (keeping ~25-30 numbers)
+  const cellsToKeep = 25 + Math.floor(Math.random() * 6);
+  const puzzle = grid.map(row => [...row]);
+  
+  let removed = 0;
+  const totalCells = 81;
+  while (removed < totalCells - cellsToKeep) {
+    const row = Math.floor(Math.random() * 9);
+    const col = Math.floor(Math.random() * 9);
+    if (puzzle[row][col] !== 0) {
+      puzzle[row][col] = 0;
+      removed++;
+    }
+  }
+  
+  return puzzle;
+}
+
+function fillBox(grid, row, col) {
+  const nums = [1,2,3,4,5,6,7,8,9];
+  for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 3; j++) {
+      const pos = Math.floor(Math.random() * nums.length);
+      grid[row + i][col + j] = nums[pos];
+      nums.splice(pos, 1);
+    }
+  }
+}
+
+function solveSudoku(grid) {
+  const empty = findEmpty(grid);
+  if (!empty) return true;
+  
+  const [row, col] = empty;
+  for (let num = 1; num <= 9; num++) {
+    if (isValid(grid, row, col, num)) {
+      grid[row][col] = num;
+      if (solveSudoku(grid)) return true;
+      grid[row][col] = 0;
+    }
+  }
+  return false;
+}
+
+function isValid(grid, row, col, num) {
+  // Check row
+  for (let x = 0; x < 9; x++) {
+    if (grid[row][x] === num) return false;
+  }
+  
+  // Check column
+  for (let y = 0; y < 9; y++) {
+    if (grid[y][col] === num) return false;
+  }
+  
+  // Check box
+  const boxRow = Math.floor(row / 3) * 3;
+  const boxCol = Math.floor(col / 3) * 3;
+  for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 3; j++) {
+      if (grid[boxRow + i][boxCol + j] === num) return false;
+    }
+  }
+  
+  return true;
+}
+
+function findEmpty(grid) {
+  for (let i = 0; i < 9; i++) {
+    for (let j = 0; j < 9; j++) {
+      if (grid[i][j] === 0) return [i, j];
+    }
+  }
+  return null;
+}
+
+function getDailyPuzzle() {
+  const today = new Date().toDateString();
+  const stored = localStorage.getItem('dailyPuzzle');
+  
+  if (stored) {
+    const {date, puzzle, savedSolution} = JSON.parse(stored);
+    if (date === today) {
+      solution = savedSolution;
+      return puzzle;
+    }
+  }
+  
+  const newPuzzle = generatePuzzle();
+  localStorage.setItem('dailyPuzzle', JSON.stringify({
+    date: today,
+    puzzle: newPuzzle,
+    savedSolution: solution
+  }));
+  
+  return newPuzzle;
+}
+
+function createGrid(puzzle) {
+  const grid = document.getElementById('sudoku-grid');
+  grid.innerHTML = '';
+  
+  for (let i = 0; i < 9; i++) {
+    const row = document.createElement('tr');
+    row.className = 'sudoku-row';
+    
+    for (let j = 0; j < 9; j++) {
+      const cell = document.createElement('td');
+      cell.className = 'sudoku-cell';
+      
+      if (puzzle[i][j] !== 0) {
+        const span = document.createElement('span');
+        span.className = 'given';
+        span.textContent = puzzle[i][j];
+        cell.appendChild(span);
+      } else {
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'input-cell';
+        input.maxLength = 1;
+        const placeholder = document.createElement('div');
+        placeholder.className = 'placeholder';
+        cell.appendChild(input);
+        cell.appendChild(placeholder);
+      }
+      
+      row.appendChild(cell);
+    }
+    
+    grid.appendChild(row);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  currentPuzzle = getDailyPuzzle();
+  createGrid(currentPuzzle);
+  
+  const inputs = document.querySelectorAll('.input-cell');
+  
+  inputs.forEach(input => {
+    const placeholder = input.nextElementSibling;
+    
+    input.addEventListener('keypress', (e) => {
+      if (!/[1-9]/.test(e.key)) {
+        e.preventDefault();
+        return false;
+      }
+    });
+
+    input.addEventListener('input', (e) => {
+      if (currentMode === 'normal') {
+        placeholder.innerHTML = '';
+        input.value = input.value.replace(/[^1-9]/g, '');
+        if (highlightMode) {
+          checkSolution();
+        }
+      } else {
+        const number = e.target.value;
+        if (number) {
+          input.value = '';
+          const numbers = Array.from(placeholder.children)
+            .map(span => span.textContent)
+            .filter(n => n !== number);
+          numbers.push(number);
+          updatePlaceholder(placeholder, numbers);
+        }
+      }
+    });
+
+    // Right click to clear cell
+    input.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      input.value = '';
+      placeholder.innerHTML = '';
+    });
+  });
+});
+
+function setMode(mode) {
+  currentMode = mode;
+  document.querySelectorAll('.mode-toggle').forEach(button => {
+    button.classList.toggle('active', button.innerText.toLowerCase().includes(mode));
+  });
+}
+
+function toggleHighlight() {
+  highlightMode = !highlightMode;
+  if (highlightMode) {
+    checkSolution();
+  } else {
+    clearHighlights();
+  }
+}
+
+function updatePlaceholder(placeholder, numbers) {
+  placeholder.innerHTML = '';
+  numbers.sort().forEach(number => {
+    const span = document.createElement('span');
+    span.textContent = number;
+    placeholder.appendChild(span);
+  });
+}
+
+function checkSolution() {
+  let solved = true;
+  const inputs = document.querySelectorAll('.input-cell');
+  inputs.forEach((input, index) => {
+    const row = Math.floor(index / 9);
+    const col = index % 9;
+    const value = parseInt(input.value, 10);
+    if (value === solution[row][col]) {
+      input.classList.add('highlight-correct');
+      input.classList.remove('highlight-incorrect');
+      input.nextElementSibling.innerHTML = '';
+      removePencilMarks(row, col, value);
+    } else if (input.value) {
+      input.classList.add('highlight-incorrect');
+      input.classList.remove('highlight-correct');
+      solved = false;
+    } else {
+      input.classList.remove('highlight-correct', 'highlight-incorrect');
+      solved = false;
+    }
+  });
+  if (solved) {
+    alert('Congratulations! You have solved the puzzle correctly.');
+  }
+}
+
+function clearHighlights() {
+  const inputs = document.querySelectorAll('.input-cell');
+  inputs.forEach(input => {
+    input.classList.remove('highlight-correct', 'highlight-incorrect');
+  });
+}
+
+function removePencilMarks(row, col, value) {
+  const inputs = document.querySelectorAll('.input-cell');
+  for (let i = 0; i < 9; i++) {
+    // Remove pencil marks in the same row
+    const rowInput = inputs[row * 9 + i];
+    const rowPlaceholder = rowInput.nextElementSibling;
+    rowPlaceholder.innerHTML = Array.from(rowPlaceholder.children)
+      .filter(span => span.textContent !== value.toString())
+      .map(span => span.outerHTML)
+      .join('');
+
+    // Remove pencil marks in the same column
+    const colInput = inputs[i * 9 + col];
+    const colPlaceholder = colInput.nextElementSibling;
+    colPlaceholder.innerHTML = Array.from(colPlaceholder.children)
+      .filter(span => span.textContent !== value.toString())
+      .map(span => span.outerHTML)
+      .join('');
+  }
+
+  // Remove pencil marks in the same 3x3 square
+  const startRow = Math.floor(row / 3) * 3;
+  const startCol = Math.floor(col / 3) * 3;
+  for (let r = startRow; r < startRow + 3; r++) {
+    for (let c = startCol; c < startCol + 3; c++) {
+      const squareInput = inputs[r * 9 + c];
+      const squarePlaceholder = squareInput.nextElementSibling;
+      squarePlaceholder.innerHTML = Array.from(squarePlaceholder.children)
+        .filter(span => span.textContent !== value.toString())
+        .map(span => span.outerHTML)
+        .join('');
+    }
+  }
+}
+
+function uploadImage() {
+  const fileInput = document.getElementById('sudoku-image');
+  const file = fileInput.files[0];
+  if (!file) {
+    alert('Please select an image file.');
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onloadend = () => {
+    const base64Image = reader.result.split(',')[1];
+    const apiKey = 'AIzaSyDHQfvq9xgUwGC1uM58wuNwXXx5kNyXjFQ';
+
+    fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        contents: [{
+          parts: [
+            { text: "Caption this image." },
+            {
+              inline_data: {
+                mime_type: "image/jpeg",
+                data: base64Image
+              }
+            }
+          ]
+        }]
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        populateSudoku(data.puzzle);
+      } else {
+        alert('Failed to process the image. Please try again.');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('An error occurred while uploading the image.');
+    });
+  };
+  reader.readAsDataURL(file);
+}
+
+function populateSudoku(puzzle) {
+  const inputs = document.querySelectorAll('.input-cell');
+  puzzle.forEach((row, rowIndex) => {
+    row.forEach((value, colIndex) => {
+      const input = inputs[rowIndex * 9 + colIndex];
+      if (value !== 0) {
+        input.value = value;
+        input.classList.add('given');
+        input.disabled = true;
+      } else {
+        input.value = '';
+        input.classList.remove('given');
+        input.disabled = false;
+      }
+    });
+  });
+}
+</script>
