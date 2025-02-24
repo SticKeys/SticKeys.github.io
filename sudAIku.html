@@ -144,15 +144,15 @@
 </div>
 
 <div class="upload-container">
-  <label for="sudoku-image" style="display: block; text-align: center; margin-bottom: 5px; font-weight: bold;">
-    Choose an image of a real world sudoku puzzle (it will be digitized onto the grid automatically)
+  <label style="display: block; text-align: center; margin-bottom: 5px; font-weight: bold;">
+    Upload a Sudoku puzzle image to digitize it:
   </label>
   <div style="text-align: center;">
     <button onclick="document.getElementById('sudoku-image-take').click();">Take Photo</button>
     <button onclick="document.getElementById('sudoku-image-choose').click();">Choose from Gallery</button>
   </div>
-  <input type="file" id="sudoku-image-take" accept="image/*" capture="environment" onchange="uploadImage()" style="display: none;">
-  <input type="file" id="sudoku-image-choose" accept="image/*" onchange="uploadImage()" style="display: none;">
+  <input type="file" id="sudoku-image-take" accept="image/*" capture="environment" onchange="uploadImage(event)" style="display: none;">
+  <input type="file" id="sudoku-image-choose" accept="image/*" onchange="uploadImage(event)" style="display: none;">
 </div>
 
 <div class="progress-container" id="upload-progress">
@@ -784,13 +784,14 @@ function parseMatrix(text) {
   }
 }
 
-function uploadImage() {
-  const fileInput = document.getElementById('sudoku-image');
-  const file = fileInput.files[0];
+function uploadImage(e) {
+  const file = e.target.files[0];
   if (!file) {
     alert('Please select an image file.');
     return;
   }
+
+  updateProgress(0, 'Starting upload...');
 
   updateProgress(0, 'Starting upload...');
 
