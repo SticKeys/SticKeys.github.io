@@ -115,10 +115,16 @@
   <button class="mode-toggle" onclick="setMode('pencil')">Pencil Mark Mode</button>
   <button class="mode-toggle" onclick="toggleHighlight()">Toggle Highlight</button>
   <button class="mode-toggle" onclick="solveAll()">Solve All</button>
+  <button onclick="shufflePuzzle()">New Puzzle</button>
 </div>
 
 <div class="upload-container">
-  <input type="file" id="sudoku-image" accept="image/*">
+  <input
+    type="file"
+    id="sudoku-image"
+    accept="image/*"
+    title="If it's having trouble uploading an image try cropping to the image around the sudoku grid"
+  >
   <button onclick="uploadImage()">Upload Image</button>
 </div>
 
@@ -769,7 +775,7 @@ function uploadImage() {
         contents: [{
           parts: [
             { 
-              text: "Look at this Sudoku puzzle and identify the numbers inside each cell. first isolate the grid, look at the puzzle cell by cell row by row. If there is no number in a cell identify it as a 0. populate a matrix with the numbers identified . Output format should be 9 lines of single-digit numbers separated by spaces, like this:\n0 1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8 9\n...\nDo not include any other text or explanations. Only output the 81 numbers in a 9x9 grid." 
+              text: "Look at this Sudoku puzzle and identify the numbers inside each cell. first crop and isolate the grid, look at the puzzle cell by cell row by row. If there is no number in a cell identify it as a 0. populate a matrix with the numbers identified . Output format should be 9 lines of single-digit numbers separated by spaces, like this:\n0 1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8 9\n...\nDo not include any other text or explanations. Only output the 81 numbers in a 9x9 grid." 
             },
             {
               inline_data: {
@@ -942,35 +948,30 @@ function populateSudoku(puzzle) {
 }
 
 function celebrateCompletion() {
-  const duration = 3000;
-  const animationEnd = Date.now() + duration;
-  const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+  const catContainer = document.createElement('div');
+  catContainer.className = 'dancing-cats-container';
+  catContainer.style.textAlign = 'center';
 
-  function randomInRange(min, max) {
-    return Math.random() * (max - min) + min;
-  }
+  const catGif = document.createElement('img');
+  catGif.src = 'https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif';
+  catGif.alt = 'Dancing Cat';
+  catGif.style.width = '200px';
 
-  const interval = setInterval(function() {
-    const timeLeft = animationEnd - Date.now();
+  catContainer.appendChild(catGif);
+  document.body.appendChild(catContainer);
 
-    if (timeLeft <= 0) {
-      return clearInterval(interval);
-    }
+  setTimeout(() => {
+    const duration = 3000;
+    const animationEnd = Date.now() + duration;
+    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 9999 };
 
-    const particleCount = 50 * (timeLeft / duration);
-    
-    // Since particles fall down, start a bit higher than random
-    confetti({
-      ...defaults,
-      particleCount,
-      origin: { x: randomInRange(0.1, 0.9), y: Math.random() - 0.2 }
-    });
-    confetti({
-      ...defaults,
-      particleCount,
-      origin: { x: randomInRange(0.1, 0.9), y: Math.random() - 0.2 }
-    });
-  }, 250);
+    const interval = setInterval(function() {
+      const timeLeft = animationEnd - Date.now();
+      if (timeLeft <= 0) return clearInterval(interval);
+      const particleCount = 50 * (timeLeft / duration);
+      confetti(Object.assign({}, defaults, { particleCount, origin: { x: Math.random(), y: Math.random() - 0.2 }}));
+    }, 250);
+  }, 500);
 }
 
 function solveAll() {
@@ -1003,6 +1004,13 @@ function solveAll() {
   if (highlightMode) {
     checkSolution();
   }
+}
+
+function shufflePuzzle() {
+  const newPuzzle = generatePuzzle();
+  currentPuzzle = newPuzzle;
+  createGrid(newPuzzle);
+  // ...existing code...
 }
 </script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
