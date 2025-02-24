@@ -1,3 +1,4 @@
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
   .sudoku-board {
     border-collapse: collapse;
@@ -108,6 +109,29 @@
     color: #666 !important;
     font-style: italic;
   }
+
+  /* Mobile friendly adjustments */
+  @media only screen and (max-width: 600px) {
+    .sudoku-cell {
+      width: 40px;
+      height: 40px;
+      font-size: 20px;
+    }
+    .mode-toggle {
+      padding: 6px 10px;
+      font-size: 14px;
+    }
+    .progress-container {
+      width: 90%;
+    }
+    .sudoku-board {
+      width: 100%;
+      overflow-x: auto;
+    }
+    #timer {
+      font-size: 14px;
+    }
+  }
 </style>
 
 <div class="sudoku-controls">
@@ -116,6 +140,7 @@
   <button class="mode-toggle" onclick="toggleHighlight()">Toggle Highlight</button>
   <button class="mode-toggle" onclick="solveAll()">Solve All</button>
   <button onclick="shufflePuzzle()">New Puzzle</button>
+  <span id="timer" style="margin-left: 20px; font-weight: bold;"></span>
 </div>
 
 <div class="upload-container">
@@ -511,6 +536,8 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   });
+  startTimer();
+  setMidnightRefresh();
 });
 
 // Add CSS style for preventing text selection on double click
@@ -1011,6 +1038,27 @@ function shufflePuzzle() {
   currentPuzzle = newPuzzle;
   createGrid(newPuzzle);
   // ...existing code...
+}
+
+function startTimer() {
+  let seconds = 0;
+  setInterval(() => {
+    seconds++;
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    document.getElementById('timer').textContent = 
+      (mins < 10 ? '0' : '') + mins + ':' + (secs < 10 ? '0' : '') + secs;
+  }, 1000);
+}
+
+function setMidnightRefresh() {
+  const now = new Date();
+  const msToMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate()+1, 0, 0, 0) - now;
+  setTimeout(() => {
+    currentPuzzle = getDailyPuzzle();
+    createGrid(currentPuzzle);
+    setMidnightRefresh();
+  }, msToMidnight);
 }
 </script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
