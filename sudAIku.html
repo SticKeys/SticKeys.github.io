@@ -356,9 +356,9 @@ function createGrid(puzzle) {
         cell.appendChild(span);
       } else {
         const input = document.createElement('input');
-        input.type = 'text';
+        input.type = 'number';
         input.inputMode = 'numeric'; // Add this line for mobile number pad
-        input.pattern = '[1-9]';     // Add this line to enforce valid input
+        input.pattern = '[1-9]*';     // Add this line to enforce valid input
         input.className = 'input-cell';
         input.maxLength = 1;
         input.dataset.row = i;
