@@ -441,9 +441,7 @@ function createGrid(puzzle) {
           if (currentMode === 'normal') {
             placeholder.innerHTML = '';
             input.value = input.value.replace(/[^1-9]/g, '');
-            if (highlightMode) {
-              setTimeout(checkSolution, 0);
-            }
+            maybeCheckPuzzle();
           } else {
             const number = e.target.value;
             if (number) {
@@ -518,6 +516,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (currentMode === 'normal') {
         placeholder.innerHTML = '';
         input.value = input.value.replace(/[^1-9]/g, '');
+        maybeCheckPuzzle();
         
         // Always check solution if highlight mode is on
         if (highlightMode) {
@@ -624,6 +623,14 @@ function updatePlaceholder(placeholder, numbers) {
   });
 }
 
+function maybeCheckPuzzle() {
+  const inputs = document.querySelectorAll('.input-cell');
+  for (const input of inputs) {
+    if (input.value.trim() === '') return;
+  }
+  checkSolution();
+}
+
 function checkSolution() {
   // Add validation for solution existence
   if (!solution) {
@@ -679,7 +686,7 @@ function checkSolution() {
     }
   }
   
-  if (solved && highlightMode) {
+  if (solved) {
     setTimeout(() => {
       celebrateCompletion();
       alert('Congratulations! You have solved the puzzle correctly!');
