@@ -109,6 +109,10 @@
     color: #666 !important;
     font-style: italic;
   }
+  .mode-toggle.pencil-mode {
+    background-color: orange;
+    color: #fff;
+  }
 
   /* Mobile friendly adjustments */
   @media only screen and (max-width: 600px) {
@@ -135,8 +139,7 @@
 </style>
 
 <div class="sudoku-controls">
-  <button class="mode-toggle active" onclick="setMode('normal')">Normal Mode</button>
-  <button class="mode-toggle" onclick="setMode('pencil')">Pencil Mark Mode</button>
+  <button id="mode-toggle-btn" class="mode-toggle" onclick="toggleMode()">✎</button>
   <button class="mode-toggle" onclick="toggleHighlight()">Toggle Highlight</button>
   <button class="mode-toggle" onclick="solveAll()">Solve All</button>
   <button onclick="shufflePuzzle()">New Puzzle</button>
@@ -177,6 +180,8 @@ let currentMode = 'normal';
 let highlightMode = false;
 let currentPuzzle = null;
 let solution = null;
+let timerInterval;
+let seconds = 0;
 
 function generatePuzzle() {
   let puzzle;
@@ -558,11 +563,22 @@ document.head.insertAdjacentHTML('beforeend', `
   </style>
 `);
 
+function toggleMode() {
+  if (currentMode === 'normal') {
+    setMode('pencil');
+  } else {
+    setMode('normal');
+  }
+}
+
 function setMode(mode) {
   currentMode = mode;
-  document.querySelectorAll('.mode-toggle').forEach(button => {
-    button.classList.toggle('active', button.innerText.toLowerCase().includes(mode));
-  });
+  const modeBtn = document.getElementById('mode-toggle-btn');
+  if (mode === 'normal') {
+    modeBtn.classList.remove('pencil-mode');
+  } else {
+    modeBtn.classList.add('pencil-mode');
+  }
 }
 
 function toggleHighlight() {
@@ -1046,12 +1062,20 @@ function shufflePuzzle() {
   const newPuzzle = generatePuzzle();
   currentPuzzle = newPuzzle;
   createGrid(newPuzzle);
-  // ...existing code...
+  startTimer(); // Reset and restart timer when new puzzle is created
 }
 
 function startTimer() {
-  let seconds = 0;
-  setInterval(() => {
+  // Clear existing timer if any
+  if (timerInterval) {
+    clearInterval(timerInterval);
+  }
+  // Reset seconds
+  seconds = 0;
+  // Update display immediately
+  document.getElementById('timer').textContent = '00:00';
+  // Start new timer
+  timerInterval = setInterval(() => {
     seconds++;
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
