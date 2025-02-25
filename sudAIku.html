@@ -143,6 +143,11 @@
   <button class="mode-toggle" onclick="toggleHighlight()">Toggle Highlight</button>
   <button class="mode-toggle" onclick="solveAll()">Solve All</button>
   <button onclick="shufflePuzzle()">New Puzzle</button>
+  <select id="difficulty-select" onchange="setDifficulty(this.value)">
+    <option value="easy">Easy</option>
+    <option value="normal" selected>Normal</option>
+    <option value="hard">Hard</option>
+  </select>
   <span id="timer" style="margin-left: 20px; font-weight: bold;"></span>
 </div>
 
@@ -182,11 +187,25 @@ let currentPuzzle = null;
 let solution = null;
 let timerInterval;
 let seconds = 0;
+let difficulty = 'normal';
+
+function setDifficulty(level) {
+  difficulty = level;
+  shufflePuzzle();
+}
 
 function generatePuzzle() {
   let puzzle;
   let attempts = 0;
   const maxAttempts = 10;
+  let minCells, maxCells;
+  if (difficulty === 'easy') {
+    minCells = 35; maxCells = 40;
+  } else if (difficulty === 'hard') {
+    minCells = 20; maxCells = 25;
+  } else {
+    minCells = 25; maxCells = 30;
+  }
 
   do {
     // Generate empty 9x9 grid
@@ -207,7 +226,7 @@ function generatePuzzle() {
     
     // Create puzzle by removing numbers
     puzzle = grid.map(row => [...row]);
-    const cellsToKeep = 25 + Math.floor(Math.random() * 6);
+    const cellsToKeep = minCells + Math.floor(Math.random() * (maxCells - minCells + 1));
     const positions = Array.from({length: 81}, (_, i) => i);
     
     // Randomly remove numbers while ensuring unique solution
@@ -224,7 +243,6 @@ function generatePuzzle() {
       // Check if puzzle still has unique solution
       if (!hasUniqueSolution(puzzle)) {
         puzzle[row][col] = temp;
-        break;
       }
     }
 
