@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SudAIku - Daily Sudoku Puzzle</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/sudoku.css">
+    <link rel="stylesheet" href="styles/mobile.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>SudAIku</h1>
+            <p>Daily Sudoku Puzzle and Image Digitizer</p>
+        </header>
+
+        <main>
+            <div class="sudoku-controls">
+                <button id="mode-toggle-btn" class="mode-toggle">✎</button>
+                <button id="highlight-btn" class="mode-toggle">Toggle Highlight</button>
+                <button id="solve-btn" class="mode-toggle">Solve All</button>
+                <button id="new-puzzle-btn">New Puzzle</button>
+                <select id="difficulty-select">
+                    <option value="easy">Easy</option>
+                    <option value="normal" selected>Normal</option>
+                    <option value="hard">Hard</option>
+                </select>
+                <span id="timer" class="timer"></span>
+            </div>
+
+            <div class="upload-container">
+                <label class="upload-label">
+                    Upload a Sudoku puzzle image to digitize it:
+                </label>
+                <div class="upload-buttons">
+                    <button id="take-photo-btn">Take Photo</button>
+                    <button id="choose-photo-btn">Choose from Gallery</button>
+                </div>
+                <input type="file" id="sudoku-image-take" accept="image/*" capture="environment" style="display: none;">
+                <input type="file" id="sudoku-image-choose" accept="image/*" style="display: none;">
+            </div>
+
+            <div class="progress-container" id="upload-progress">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+                <div class="progress-text" id="progress-text">Uploading...</div>
+            </div>
+
+            <table class="sudoku-board" id="sudoku-grid">
+                <!-- Grid will be populated by JavaScript -->
+            </table>
+        </main>
+
+        <footer class="info-section">
+            <p>Daily Sudoku Puzzle and sudoku image digitizer :o</p>
+            <p>I made this for my girlfriend because I love her :)</p>
+        </footer>
+    </div>
+
+    <!-- External Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@google/generative-ai@latest"></script>
+    
+    <!-- Application Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/env-loader.js"></script>
+    <script src="js/sudoku-generator.js"></script>
+    <script src="js/sudoku-solver.js"></script>
+    <script src="js/grid-manager.js"></script>
+    <script src="js/image-processor.js"></script>
+    <script src="js/ui-controller.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

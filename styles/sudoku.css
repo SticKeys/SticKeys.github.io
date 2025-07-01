@@ -1,0 +1,149 @@
+/* Sudoku Board Styles */
+.sudoku-board {
+    border-collapse: collapse;
+    margin: 20px auto;
+    background-color: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.sudoku-cell {
+    width: 50px;
+    height: 50px;
+    text-align: center;
+    border: 1px solid #ccc;
+    position: relative;
+    background-color: white;
+    transition: background-color 0.2s ease;
+}
+
+/* Grid lines for 3x3 boxes */
+.sudoku-cell:nth-child(3n) {
+    border-right: 3px solid #333;
+}
+
+.sudoku-row:nth-child(3n) td {
+    border-bottom: 3px solid #333;
+}
+
+/* First and last borders */
+.sudoku-row:first-child td {
+    border-top: 3px solid #333;
+}
+
+.sudoku-cell:first-child {
+    border-left: 3px solid #333;
+}
+
+/* Given numbers (pre-filled) */
+.given {
+    font-weight: bold;
+    font-size: 24px;
+    color: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    background-color: #f8f8f8;
+}
+
+/* Input cells */
+.input-cell {
+    width: 100%;
+    height: 100%;
+    border: none;
+    text-align: center;
+    font-size: 24px;
+    padding: 0;
+    outline: none;
+    color: #0066cc;
+    background-color: transparent;
+    font-weight: 500;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.input-cell:focus {
+    background-color: #e6f3ff;
+}
+
+/* Pencil marks */
+.placeholder {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    right: 2px;
+    bottom: 2px;
+    font-size: 10px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    pointer-events: none;
+    gap: 1px;
+}
+
+.placeholder span {
+    color: #999;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: normal;
+}
+
+/* Highlighting */
+.highlight-correct {
+    background-color: #ccffcc !important;
+    animation: pulse-correct 0.5s ease-in-out;
+}
+
+.highlight-incorrect {
+    background-color: #ffcccc !important;
+    animation: pulse-incorrect 0.5s ease-in-out;
+}
+
+/* Solved state */
+.solved {
+    color: #666 !important;
+    font-style: italic;
+    background-color: #f0f0f0 !important;
+}
+
+/* Hover effects */
+.sudoku-cell:hover {
+    background-color: #f0f8ff;
+}
+
+.sudoku-cell:hover .input-cell {
+    background-color: transparent;
+}
+
+/* Focus styles */
+.input-cell:focus {
+    box-shadow: inset 0 0 5px rgba(0, 102, 204, 0.3);
+}
+
+/* Animations */
+@keyframes pulse-correct {
+    0% { background-color: #ccffcc; }
+    50% { background-color: #99ff99; }
+    100% { background-color: #ccffcc; }
+}
+
+@keyframes pulse-incorrect {
+    0% { background-color: #ffcccc; }
+    50% { background-color: #ff9999; }
+    100% { background-color: #ffcccc; }
+}
+
+/* Remove number input arrows */
+.input-cell::-webkit-outer-spin-button,
+.input-cell::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.input-cell[type=number] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}

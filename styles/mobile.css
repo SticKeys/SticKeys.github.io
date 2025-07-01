@@ -1,0 +1,236 @@
+/* Mobile and Responsive Styles */
+
+/* Tablet styles */
+@media only screen and (max-width: 768px) {
+    .container {
+        margin: 10px;
+        padding: 15px;
+        border-radius: 8px;
+    }
+    
+    header h1 {
+        font-size: 2rem;
+    }
+    
+    .sudoku-controls {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .sudoku-cell {
+        width: 45px;
+        height: 45px;
+    }
+    
+    .given, .input-cell {
+        font-size: 20px;
+    }
+    
+    .timer {
+        margin-left: 0;
+        margin-top: 10px;
+    }
+}
+
+/* Mobile styles */
+@media only screen and (max-width: 600px) {
+    body {
+        padding: 10px;
+    }
+    
+    .container {
+        margin: 5px;
+        padding: 10px;
+        border-radius: 6px;
+    }
+    
+    header {
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+    }
+    
+    header h1 {
+        font-size: 1.8rem;
+        margin-bottom: 5px;
+    }
+    
+    header p {
+        font-size: 1rem;
+    }
+    
+    .sudoku-controls {
+        margin: 15px 0;
+        gap: 6px;
+    }
+    
+    .mode-toggle, button, select {
+        padding: 6px 10px;
+        font-size: 12px;
+        border-radius: 4px;
+    }
+    
+    .sudoku-cell {
+        width: 35px;
+        height: 35px;
+    }
+    
+    .given, .input-cell {
+        font-size: 16px;
+    }
+    
+    .placeholder {
+        font-size: 8px;
+    }
+    
+    .placeholder span {
+        font-size: 8px;
+    }
+    
+    .timer {
+        font-size: 14px;
+        padding: 4px 8px;
+        margin-left: 0;
+        margin-top: 10px;
+    }
+    
+    .progress-container {
+        width: 90%;
+        margin: 10px auto;
+    }
+    
+    .sudoku-board {
+        margin: 15px auto;
+        width: 100%;
+        overflow-x: auto;
+    }
+    
+    .upload-container {
+        margin: 15px 0;
+        padding: 15px;
+    }
+    
+    .upload-label {
+        font-size: 14px;
+        margin-bottom: 10px;
+    }
+    
+    .upload-buttons {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .upload-buttons button {
+        width: 100%;
+        max-width: 200px;
+    }
+    
+    .info-section {
+        font-size: 14px;
+        padding: 15px;
+        margin: 15px 0;
+    }
+}
+
+/* Extra small mobile styles */
+@media only screen and (max-width: 400px) {
+    .sudoku-cell {
+        width: 30px;
+        height: 30px;
+    }
+    
+    .given, .input-cell {
+        font-size: 14px;
+    }
+    
+    .placeholder {
+        font-size: 7px;
+    }
+    
+    .placeholder span {
+        font-size: 7px;
+    }
+    
+    header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .mode-toggle, button, select {
+        padding: 4px 8px;
+        font-size: 11px;
+    }
+    
+    .timer {
+        font-size: 12px;
+    }
+}
+
+/* Landscape orientation adjustments */
+@media only screen and (max-height: 500px) and (orientation: landscape) {
+    .container {
+        padding: 10px;
+    }
+    
+    header {
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+    }
+    
+    header h1 {
+        font-size: 1.5rem;
+        margin-bottom: 5px;
+    }
+    
+    header p {
+        font-size: 0.9rem;
+    }
+    
+    .sudoku-controls {
+        margin: 10px 0;
+    }
+    
+    .sudoku-board {
+        margin: 10px auto;
+    }
+    
+    .upload-container {
+        margin: 10px 0;
+        padding: 10px;
+    }
+    
+    .info-section {
+        margin: 10px 0;
+        padding: 10px;
+        font-size: 14px;
+    }
+}
+
+/* Touch-friendly adjustments */
+@media (pointer: coarse) {
+    .mode-toggle, button, select {
+        min-height: 44px;
+        min-width: 44px;
+        padding: 8px 12px;
+    }
+    
+    .sudoku-cell {
+        min-width: 40px;
+        min-height: 40px;
+    }
+    
+    .input-cell {
+        touch-action: manipulation;
+    }
+}
+
+/* High DPI displays */
+@media only screen and (-webkit-min-device-pixel-ratio: 2),
+       only screen and (min-device-pixel-ratio: 2),
+       only screen and (min-resolution: 192dpi) {
+    .sudoku-board {
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .container {
+        box-shadow: 0 2px 3px rgba(0, 0, 0, 0.05);
+    }
+}
